@@ -1,12 +1,15 @@
 package com.imdb.cucmbersteps;
 
 import com.imdb.pages.*;
+import io.cucumber.datatable.DataTable;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import net.serenitybdd.annotations.Steps;
 
+import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 
@@ -27,7 +30,8 @@ public class UserRegistrationSteps {
     @Steps
     PuzzlePage puzzlePage;
 
-    String uniqueEmail = "testuser+" + UUID.randomUUID().toString() + "@example.com";
+    String uniqueEmail(){
+        return "testuser+" + UUID.randomUUID().toString() + "@example.com";}
 
 
     @Given("I am a new user on the IMDb homepage")
@@ -52,16 +56,22 @@ public class UserRegistrationSteps {
     }
 
     @And("I fill in the registration form with all required details")
-    public void i_fill_in_the_registration_form_with_all_required_details() {
-        registrationPage.fillRegistrationForm("Test User", uniqueEmail, "TestPassword123");
+    public void i_fill_in_the_registration_form_with_all_required_details(DataTable dataTable) {
+        List<Map<String, String>> registrationData = dataTable.asMaps(String.class, String.class);
+        Map<String, String> data = registrationData.get(0);
+        String name = data.get("name");
+        String email = uniqueEmail();
+        String password = data.get("password");
+        registrationPage.fillRegistrationForm(name, email, password);
     }
 
     @Then("I should be able to complete the registration process and land on the authorized member page")
     public void i_should_be_able_to_complete_the_registration_process_and_land_on_the_authorized_member_page() {
         registrationPage.submitRegistration();
         assert puzzlePage.isDisplayed();
+        System.out.println("CAPTCHA is displayed, cannot proceed.");
 
-        //Since puzzle page is displayed, we can assume that the user is logged in and is on the member page, captche cant be automated
+        //Cannot proceed further since puzzle page is displayed, we can assume that the user is logged in and is on the member page, CAPTCHA cant be automated
     }
 
     @Given("I am on the account registration page to register")
@@ -73,8 +83,13 @@ public class UserRegistrationSteps {
     }
 
     @When("I attempt to register with an email address that is already in use")
-    public void i_attempt_to_register_with_an_email_address_that_is_already_in_use() {
-        registrationPage.fillRegistrationForm("Test User", "fathima.saltmine+imdb1@gmail.com", "TestPassword123");
+    public void i_attempt_to_register_with_an_email_address_that_is_already_in_use(DataTable dataTable) {
+        List<Map<String, String>> registrationData = dataTable.asMaps(String.class, String.class);
+        Map<String, String> data = registrationData.get(0);
+        String name = data.get("name");
+        String email = data.get("email");
+        String password = data.get("password");
+        registrationPage.fillRegistrationForm(name, email, password);
         registrationPage.submitRegistration();
     }
 
@@ -85,12 +100,18 @@ public class UserRegistrationSteps {
 
 
     @Given("I am logged into the member page")
-    public void i_am_logged_into_the_member_page() {
+    public void i_am_logged_into_the_member_page(DataTable dataTable) {
         homePage.open();
         homePage.clickSignInButton();
         registrationPage.clickCreateAccountButton();
         registrationPage.clickExistingAccountSignInButton();
-        loginPage.fillSignInForm("fathima.saltmine+imdb1@gmail.com", "2024#Imdb");
+
+        List<Map<String, String>> loginData = dataTable.asMaps(String.class, String.class);
+        Map<String, String> data = loginData.get(0);
+        String email = data.get("email");
+        String password = data.get("password");
+
+        loginPage.fillSignInForm(email, password);
         loginPage.submitSignIn();
         if (puzzlePage.isDisplayed()) {
             System.out.println("Puzzle page is displayed, cannot proceed.");
@@ -120,8 +141,13 @@ public class UserRegistrationSteps {
     }
 
     @And("I fill in my email and password correctly")
-    public void i_fill_in_my_email_and_password_correctly() {
-        loginPage.fillSignInForm("fathima.saltmine+imdb1@gmail.com", "2024#Imdb");
+    public void i_fill_in_my_email_and_password_correctly(DataTable dataTable) {
+        List<Map<String, String>> loginData = dataTable.asMaps(String.class, String.class);
+        Map<String, String> data = loginData.get(0);
+        String email = data.get("email");
+        String password = data.get("password");
+
+        loginPage.fillSignInForm(email, password);
     }
 
     @Then("I should be able to login and access the member page again")
@@ -133,6 +159,4 @@ public class UserRegistrationSteps {
         }
         assert member.isDisplayed();
     }
-
-
 }
