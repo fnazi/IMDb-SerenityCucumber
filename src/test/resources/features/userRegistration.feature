@@ -16,18 +16,18 @@ Feature: user Registration
   Given I am on the account registration page to register
   When I attempt to register with an email address that is already in use
     | name      | email                            | password        |
-    | Test User | fathima.saltmine+imdb1@gmail.com | TestPassword123 |
+    | Test User | imdbtest@mailslurp.com           | Imdbtester|
   Then I should see an error message displayed and not be allowed to complete the registration
 
   Scenario: Logout and Login Functionality
 
   Given I am logged into the member page
-    | email                              | password        |
-    | fathima.saltmine+imdb1@gmail.com   | 2024#Imdb       |
+    | email                              | password      |
+    | imdbtest@mailslurp.com             | Imdbtest      |
   When I log out from the application
   Then I should be redirected to the login page and not be able to access the member page
   When I am on the login page
   And I fill in my email and password correctly
     | email                              | password        |
-    | fathima.saltmine+imdb1@gmail.com   | 2024#Imdb       |
+    | imdbtest@mailslurp.com             | Imdbtest        |
   Then I should be able to login and access the member page again
